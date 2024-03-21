@@ -1,12 +1,19 @@
 data "spacelift_current_space" "this" {}
 
+locals {
+  terraform_workflow_tool = "OPEN_TOFU"
+  terraform_version       = "1.6.2"
+}
+
 resource "spacelift_stack" "spacelift" {
   name     = "spacelift"
   space_id = data.spacelift_current_space.this.id
 
-  repository   = "dataplatform-spacelift"
-  branch       = "main"
-  project_root = "spacelift"
+  repository              = "dataplatform-spacelift"
+  branch                  = "main"
+  project_root            = "spacelift"
+  terraform_workflow_tool = local.terraform_workflow_tool
+  terraform_version       = local.terraform_version
 
   administrative = true
   autodeploy     = true
@@ -52,5 +59,6 @@ resource "spacelift_stack" "databricks_dev" {
   branch       = "main"
   project_root = "stacks/databricks-workspace"
 
-  labels = ["global", "dev"]
+  autodeploy = true
+  labels     = ["global", "dev"]
 }
