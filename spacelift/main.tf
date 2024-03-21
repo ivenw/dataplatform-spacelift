@@ -7,7 +7,7 @@ resource "spacelift_stack" "spacelift" {
   project_root = "spacelift"
 
   administrative = true
-  auto_apply     = true
+  autodeploy     = true
 }
 
 resource "spacelift_space" "dataplatform" {
