@@ -1,3 +1,8 @@
+import {
+  to = spacelift_stack.spacelift
+  id = "spacelift"
+}
+
 resource "spacelift_stack" "spacelift" {
   name     = "spacelift"
   space_id = "root"
