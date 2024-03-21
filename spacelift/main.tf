@@ -55,9 +55,11 @@ resource "spacelift_stack" "databricks_dev" {
   name     = "databricks-dev"
   space_id = spacelift_space.dataplatform.id
 
-  repository   = "dataplatform-spacelift"
-  branch       = "main"
-  project_root = "stacks/databricks-workspace"
+  repository              = "dataplatform-spacelift"
+  branch                  = "main"
+  project_root            = "stacks/databricks-workspace"
+  terraform_workflow_tool = local.terraform_workflow_tool
+  terraform_version       = local.terraform_version
 
   autodeploy = true
   labels     = ["global", "dev"]
