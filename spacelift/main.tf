@@ -64,3 +64,29 @@ resource "spacelift_stack" "databricks_dev" {
   autodeploy = true
   labels     = ["global", "dev"]
 }
+
+resource "spacelift_stack" "test" {
+  name     = "test"
+  space_id = spacelift_space.dataplatform.id
+
+  repository              = "dataplatform-spacelift"
+  branch                  = "main"
+  project_root            = "stacks/integration"
+  terraform_workflow_tool = local.terraform_workflow_tool
+  terraform_version       = local.terraform_version
+
+  autodeploy = true
+  labels     = ["global", "dev"]
+}
+
+resource "spacelift_stack_dependency" "databricks_dev_test" {
+  stack_id      = spacelift_stack.test.id
+  depends_on_id = spacelift_stack.databricks_dev.id
+}
+
+resource "spacelift_stack_dependency_reference" "databricks_dev_test" {
+  stack_dependency_id = spacelift_stack_dependency.databricks_dev_test.id
+  output_name         = "env"
+  input_name          = "TF_VAR_test"
+}
+
