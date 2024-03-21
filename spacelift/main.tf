@@ -80,8 +80,8 @@ resource "spacelift_stack" "test" {
 }
 
 resource "spacelift_stack_dependency" "databricks_dev_test" {
-  stack_id      = spacelift_stack.test.id
-  depends_on_id = spacelift_stack.databricks_dev.id
+  stack_id            = spacelift_stack.test.id
+  depends_on_stack_id = spacelift_stack.databricks_dev.id
 }
 
 resource "spacelift_stack_dependency_reference" "databricks_dev_test" {
