@@ -65,7 +65,7 @@ module "databricks_workspace_dev" {
 module "test" {
   source = "../modules/spacelift-stack"
 
-  name     = "test"
+  name     = "test2"
   space_id = spacelift_space.dataplatform.id
 
   repository   = "dataplatform-spacelift"
