@@ -1,11 +1,11 @@
 data "spacelift_current_space" "this" {}
 
 locals {
-  terraform_workflow_tool     = "OPEN_TOFU"
-  terraform_version           = "1.6.2"
-  repository                  = "dataplatform-spacelift"
-  environment_slugs_resources = ["dev", "prd"]
-  environment_slugs_catalogs  = ["dev", "stg", "prd"]
+  terraform_workflow_tool = "OPEN_TOFU"
+  terraform_version       = "1.6.2"
+  repository              = "dataplatform-spacelift"
+  environments_resource   = ["dev", "prd"]
+  environments_catalog    = ["dev", "stg", "prd"]
 }
 
 resource "spacelift_stack" "spacelift" {
@@ -36,26 +36,27 @@ module "context_global" {
   description = "Global context"
   labels      = ["autoattach:global"]
   environment_variables = {
-    TF_VAR_location = "westeurope"
+    TF_VAR_location         = "westeurope"
+    TF_VAR_application_slug = "dp"
   }
 }
 
 module "context_environment_resources" {
   source   = "../modules/spacelift-context"
-  for_each = toset(local.environment_slugs_resources)
+  for_each = toset(local.environments_resource)
 
   name        = "environment-${each.key}"
   space_id    = spacelift_space.dataplatform.id
   description = "Development environment context"
   labels      = ["autoattach:${each.key}"]
   environment_variables = {
-    TF_VAR_environment_slug = each.key
+    TF_VAR_environment = each.key
   }
 }
 
 module "stack_integration" {
   source   = "../modules/spacelift-stack"
-  for_each = toset(local.environment_slugs_resources)
+  for_each = toset(local.environments_resource)
 
   name     = "integration-${each.key}"
   space_id = spacelift_space.dataplatform.id
@@ -70,7 +71,7 @@ module "stack_integration" {
 
 module "stack_databricks_workspace" {
   source   = "../modules/spacelift-stack"
-  for_each = toset(local.environment_slugs_resources)
+  for_each = toset(local.environments_resource)
 
   name     = "databricks-${each.key}"
   space_id = spacelift_space.dataplatform.id

@@ -19,8 +19,8 @@ variable "location_data" {
     short_name = string
   })
 }
-variable "application" {
-  description = "The name of the application."
+variable "application_slug" {
+  description = "The slug of the application."
   type        = string
 }
 variable "workload" {
@@ -29,7 +29,7 @@ variable "workload" {
   default     = []
 }
 variable "environment" {
-  description = "The name of the environment."
+  description = "The slug of the environment."
   type        = string
   default     = ""
   validation {
@@ -43,7 +43,7 @@ data "azurerm_subscription" "current" {}
 locals {
   guid_seed = [
     data.azurerm_subscription.current.id,
-    var.application,
+    var.application_slug,
     var.location_data.short_name,
     var.environment
   ]
@@ -52,7 +52,7 @@ locals {
   scope_requires_guid = contains(["global", "region"], var.naming_data.scope)
   name_list = compact(flatten([
     var.naming_data.slug,
-    var.application,
+    var.application_slug,
     var.workload,
     local.scope_requires_guid ? local.guid_short : "",
     var.location_data.short_name,
