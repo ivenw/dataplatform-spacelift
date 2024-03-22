@@ -58,7 +58,7 @@ resource "spacelift_stack" "this" {
 }
 
 resource "spacelift_stack_dependency" "this" {
-  for_each = toset([for d in var.dependencies : d.id])
+  for_each = toset([for d in var.dependencies : d.stack_id])
 
   stack_id            = spacelift_stack.this.id
   depends_on_stack_id = each.value
