@@ -73,7 +73,7 @@ module "test" {
   labels       = ["global", "dev"]
 
   dependencies = {
-    module.databricks_workspace_dev.stack_id = {
+    (module.databricks_workspace_dev.stack_id) = {
       env = "TF_VAR_test"
     }
   }
