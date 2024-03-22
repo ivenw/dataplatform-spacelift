@@ -33,7 +33,7 @@ variable "dependencies" {
   description = "Other stacks this stack depends on"
   type = list(object({
     stack_id   = string
-    dependency = map(string)
+    references = map(string)
   }))
   default = []
 }
