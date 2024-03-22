@@ -55,16 +55,23 @@ resource "spacelift_stack" "this" {
 }
 
 resource "spacelift_stack_dependency" "this" {
-  for_each = var.dependencies
+  // Count is not ideal in this case, but the only way to make this work.
+  // Reordering dependencies in input will lead to recreation of these resources,
+  // but this doesn't really matter in this instance, since its stateless configuration.
+  count = length(var.dependencies)
 
   stack_id            = spacelift_stack.this.id
-  depends_on_stack_id = each.key
+  depends_on_stack_id = var.dependencies[count.index].stack_id
 }
 
 locals {
+  dependency_indexes = {
+    for stack_id, references in var.dependencies : stack_id => count.index
+  }
   dependencies = flatten([
     for stack_id, references in var.dependencies : [
       for output_name, input_name in references : {
+        index       = dependency_indexes[stack_id]
         stack_id    = stack_id
         output_name = output_name
         input_name  = input_name
