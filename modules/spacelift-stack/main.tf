@@ -65,13 +65,10 @@ resource "spacelift_stack_dependency" "this" {
 }
 
 locals {
-  dependency_indexes = {
-    for stack_id, references in var.dependencies : stack_id => count.index
-  }
   dependencies = flatten([
     for stack_id, references in var.dependencies : [
       for output_name, input_name in references : {
-        index       = local.dependency_indexes[stack_id]
+        index       = index(keys(var.dependencies), stack_id)
         stack_id    = stack_id
         output_name = output_name
         input_name  = input_name
@@ -86,7 +83,7 @@ resource "spacelift_stack_dependency_reference" "this" {
   // but this doesn't really matter in this instance, since its stateless configuration.
   count = length(local.dependencies)
 
-  stack_dependency_id = spacelift_stack_dependency.this[local.dependencies[count.index].stack_id].id
+  stack_dependency_id = spacelift_stack_dependency.this[local.dependencies[count.index].index].id
   output_name         = local.dependencies[count.index].output_name
   input_name          = local.dependencies[count.index].input_name
 }
