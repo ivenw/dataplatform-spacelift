@@ -58,17 +58,17 @@ resource "spacelift_stack" "this" {
 }
 
 resource "spacelift_stack_dependency" "this" {
-  for_each = toset([for d in var.dependencies : d.stack_id])
+  for_each = toset(var.dependencies)
 
   stack_id            = spacelift_stack.this.id
-  depends_on_stack_id = each.value
+  depends_on_stack_id = each.value.stack_id
 }
 
 resource "spacelift_stack_dependency_reference" "this" {
   for_each = toset(flatten([
     for dependency in var.dependencies : [
       for output_name, input_name in dependency.references : {
-        stack_id    = dependency.id
+        stack_id    = dependency
         output_name = output_name
         input_name  = input_name
       }
