@@ -50,6 +50,18 @@ module "context_environment_dev" {
   }
 }
 
+module "context_environment_prd" {
+  source = "../modules/spacelift-context"
+
+  name        = "environment-prd"
+  space_id    = spacelift_space.dataplatform.id
+  description = "prdelopment environment context"
+  labels      = ["autoattach:prd"]
+  environment_variables = {
+    TF_VAR_environment_slug = "prd"
+  }
+}
+
 module "stack_integration_dev" {
   source = "../modules/spacelift-stack"
 
