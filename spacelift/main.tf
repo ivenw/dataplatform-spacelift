@@ -1,10 +1,11 @@
 data "spacelift_current_space" "this" {}
 
 locals {
-  terraform_workflow_tool = "OPEN_TOFU"
-  terraform_version       = "1.6.2"
-  repository              = "dataplatform-spacelift"
-  environment_slugs       = ["dev", "prd"]
+  terraform_workflow_tool     = "OPEN_TOFU"
+  terraform_version           = "1.6.2"
+  repository                  = "dataplatform-spacelift"
+  environment_slugs_resources = ["dev", "prd"]
+  environment_slugs_catalogs  = ["dev", "stg", "prd"]
 }
 
 resource "spacelift_stack" "spacelift" {
@@ -39,9 +40,9 @@ module "context_global" {
   }
 }
 
-module "context_environment" {
+module "context_environment_resources" {
   source   = "../modules/spacelift-context"
-  for_each = toset(local.environment_slugs)
+  for_each = toset(local.environment_slugs_resources)
 
   name        = "environment-${each.key}"
   space_id    = spacelift_space.dataplatform.id
@@ -54,7 +55,7 @@ module "context_environment" {
 
 module "stack_integration" {
   source   = "../modules/spacelift-stack"
-  for_each = toset(local.environment_slugs)
+  for_each = toset(local.environment_slugs_resources)
 
   name     = "integration-${each.key}"
   space_id = spacelift_space.dataplatform.id
@@ -63,13 +64,13 @@ module "stack_integration" {
   project_root = "stacks/integration"
   labels = concat(
     module.context_global.autoattach_labels,
-    module.context_environment[each.key].autoattach_labels
+    module.context_environment_resources[each.key].autoattach_labels
   )
 }
 
 module "stack_databricks_workspace" {
   source   = "../modules/spacelift-stack"
-  for_each = toset(local.environment_slugs)
+  for_each = toset(local.environment_slugs_resources)
 
   name     = "databricks-${each.key}"
   space_id = spacelift_space.dataplatform.id
@@ -78,7 +79,7 @@ module "stack_databricks_workspace" {
   project_root = "stacks/databricks-workspace"
   labels = concat(
     module.context_global.autoattach_labels,
-    module.context_environment[each.key].autoattach_labels
+    module.context_environment_resources[each.key].autoattach_labels
   )
 }
 
