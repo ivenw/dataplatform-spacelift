@@ -63,7 +63,7 @@ module "stack_integration" {
   project_root = "stacks/integration"
   labels = concat(
     module.context_global.autoattach_labels,
-    module.context_environment_dev.autoattach_labels
+    module.context_environment[each.key].autoattach_labels
   )
 }
 
