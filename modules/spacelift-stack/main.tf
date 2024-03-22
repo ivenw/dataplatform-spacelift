@@ -22,10 +22,12 @@ variable "repository" {
 variable "project_root" {
   description = "The root directory of the project"
   type        = string
+  default     = null
 }
 variable "labels" {
   description = "The labels to add to the stack"
   type        = list(string)
+  default     = []
 }
 variable "dependencies" {
   description = "Other stacks this stack depends on"
@@ -33,6 +35,7 @@ variable "dependencies" {
     id         = string
     references = map(string)
   }))
+  default = []
 }
 
 locals {
@@ -42,7 +45,7 @@ locals {
 
 resource "spacelift_stack" "this" {
   name     = var.name
-  space_id = var.space.id
+  space_id = var.space_id
 
   repository              = var.repository
   branch                  = "main"

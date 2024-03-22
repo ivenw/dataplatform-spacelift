@@ -72,7 +72,7 @@ module "test" {
   project_root = "stacks/integration"
   labels       = ["global", "dev"]
 
-  depends_on = [
+  dependencies = [
     {
       stack_id = module.databricks_workspace_dev.id
       references = {
