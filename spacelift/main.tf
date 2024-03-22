@@ -4,6 +4,7 @@ locals {
   terraform_workflow_tool = "OPEN_TOFU"
   terraform_version       = "1.6.2"
   repository              = "dataplatform-spacelift"
+  environment_slugs       = ["dev", "prd"]
 }
 
 resource "spacelift_stack" "spacelift" {
@@ -38,34 +39,24 @@ module "context_global" {
   }
 }
 
-module "context_environment_dev" {
-  source = "../modules/spacelift-context"
+module "context_environment" {
+  source   = "../modules/spacelift-context"
+  for_each = toset(local.environment_slugs)
 
-  name        = "environment-dev"
+  name        = "environment-${each.key}"
   space_id    = spacelift_space.dataplatform.id
   description = "Development environment context"
   labels      = ["autoattach:dev"]
   environment_variables = {
-    TF_VAR_environment_slug = "dev"
+    TF_VAR_environment_slug = each.key
   }
 }
 
-module "context_environment_prd" {
-  source = "../modules/spacelift-context"
+module "stack_integration" {
+  source   = "../modules/spacelift-stack"
+  for_each = toset(local.environment_slugs)
 
-  name        = "environment-prd"
-  space_id    = spacelift_space.dataplatform.id
-  description = "prdelopment environment context"
-  labels      = ["autoattach:prd"]
-  environment_variables = {
-    TF_VAR_environment_slug = "prd"
-  }
-}
-
-module "stack_integration_dev" {
-  source = "../modules/spacelift-stack"
-
-  name     = "integration-dev"
+  name     = "integration-${each.key}"
   space_id = spacelift_space.dataplatform.id
 
   repository   = local.repository
@@ -76,17 +67,18 @@ module "stack_integration_dev" {
   )
 }
 
-module "stack_databricks_workspace_dev" {
-  source = "../modules/spacelift-stack"
+module "stack_databricks_workspace" {
+  source   = "../modules/spacelift-stack"
+  for_each = toset(local.environment_slugs)
 
-  name     = "databricks-dev"
+  name     = "databricks-${each.key}"
   space_id = spacelift_space.dataplatform.id
 
   repository   = local.repository
   project_root = "stacks/databricks-workspace"
   labels = concat(
     module.context_global.autoattach_labels,
-    module.context_environment_dev.autoattach_labels
+    module.context_environment[each.key].autoattach_labels
   )
 }
 
