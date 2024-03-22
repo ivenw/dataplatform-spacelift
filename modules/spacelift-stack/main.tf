@@ -70,7 +70,7 @@ resource "spacelift_stack_dependency" "this" {
 locals {
   dependencies = flatten([
     for dependency in var.dependencies : [
-      for output_name, input_name in dependency : {
+      for output_name, input_name in dependency.references : {
         index       = index(var.dependencies, dependency)
         stack_id    = dependency.stack_id
         output_name = output_name
