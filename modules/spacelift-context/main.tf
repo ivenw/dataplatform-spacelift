@@ -49,7 +49,7 @@ locals {
   autoattach_label_pattern = "autoattach:(.*)"
   autoattach_labels = [
     for label in var.labels :
-    can(regex(local.autoattach_label_pattern, label), true)
+    can(regex(local.autoattach_label_pattern, label))
     ? regex(local.autoattach_label_pattern, label)[0] : null
   ]
 }
