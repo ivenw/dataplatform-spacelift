@@ -13,7 +13,7 @@ variable "name" {
 }
 variable "space_id" {
   description = "The ID of the space resource the stack should be created in"
-  id          = string
+  type        = string
 }
 variable "repository" {
   description = "The repository the stack should be created from"
@@ -27,7 +27,7 @@ variable "labels" {
   description = "The labels to add to the stack"
   type        = list(string)
 }
-variable "depends_on" {
+variable "dependencies" {
   description = "Other stacks this stack depends on"
   type = list(object({
     id         = string
@@ -55,7 +55,7 @@ resource "spacelift_stack" "this" {
 }
 
 resource "spacelift_stack_dependency" "this" {
-  for_each = toset([for d in var.depends_on : d.id])
+  for_each = toset([for d in var.dependencies : d.id])
 
   stack_id            = spacelift_stack.test.id
   depends_on_stack_id = each.value
@@ -63,7 +63,7 @@ resource "spacelift_stack_dependency" "this" {
 
 resource "spacelift_stack_dependency_reference" "this" {
   for_each = toset(flatten([
-    for dependency in var.depends_on : [
+    for dependency in var.dependencies : [
       for output_name, input_name in obj.references : {
         stack_id    = dependency.id
         output_name = output_name
