@@ -3,13 +3,14 @@ data "spacelift_current_space" "this" {}
 locals {
   terraform_workflow_tool = "OPEN_TOFU"
   terraform_version       = "1.6.2"
+  repository              = "dataplatform-spacelift"
 }
 
 resource "spacelift_stack" "spacelift" {
   name     = "spacelift"
   space_id = data.spacelift_current_space.this.id
 
-  repository              = "dataplatform-spacelift"
+  repository              = local.repository
   branch                  = "main"
   project_root            = "spacelift"
   terraform_workflow_tool = local.terraform_workflow_tool
@@ -49,37 +50,31 @@ module "context_environment_dev" {
   }
 }
 
-module "stack_databricks_workspace_dev" {
+module "stack_integration_dev" {
   source = "../modules/spacelift-stack"
 
-  name     = "databricks-dev"
+  name     = "integration-dev"
   space_id = spacelift_space.dataplatform.id
 
-  repository   = "dataplatform-spacelift"
-  project_root = "stacks/databricks-workspace"
+  repository   = local.repository
+  project_root = "stacks/integration"
   labels = concat(
     module.context_global.autoattach_labels,
     module.context_environment_dev.autoattach_labels
   )
 }
 
-module "test" {
+module "stack_databricks_workspace_dev" {
   source = "../modules/spacelift-stack"
 
-  name     = "test"
+  name     = "databricks-dev"
   space_id = spacelift_space.dataplatform.id
 
-  repository   = "dataplatform-spacelift"
-  project_root = "stacks/integration"
-  labels       = ["global", "dev"]
-
-  dependencies = [
-    {
-      stack_id = module.stack_databricks_workspace_dev.stack_id
-      references = {
-        env = "TF_VAR_test"
-      }
-    }
-  ]
+  repository   = local.repository
+  project_root = "stacks/databricks-workspace"
+  labels = concat(
+    module.context_global.autoattach_labels,
+    module.context_environment_dev.autoattach_labels
+  )
 }
 

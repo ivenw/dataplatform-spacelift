@@ -24,6 +24,11 @@ variable "project_root" {
   type        = string
   default     = null
 }
+variable "branch" {
+  description = "The branch of the repository the stack should be created from"
+  type        = string
+  default     = "main"
+}
 variable "labels" {
   description = "The labels to add to the stack"
   type        = list(string)
@@ -48,7 +53,7 @@ resource "spacelift_stack" "this" {
   space_id = var.space_id
 
   repository              = var.repository
-  branch                  = "main"
+  branch                  = var.branch
   project_root            = var.project_root
   terraform_workflow_tool = local.terraform_workflow_tool
   terraform_version       = local.terraform_version
