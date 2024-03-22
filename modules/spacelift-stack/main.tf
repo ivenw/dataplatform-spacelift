@@ -71,7 +71,7 @@ locals {
   dependencies = flatten([
     for stack_id, references in var.dependencies : [
       for output_name, input_name in references : {
-        index       = dependency_indexes[stack_id]
+        index       = local.dependency_indexes[stack_id]
         stack_id    = stack_id
         output_name = output_name
         input_name  = input_name
