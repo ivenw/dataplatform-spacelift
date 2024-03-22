@@ -75,7 +75,7 @@ resource "spacelift_stack_dependency_reference" "this" {
     ]
   ]))
 
-  stack_dependency_id = spacelift_stack_dependency.this[dependency.stack_id].id
+  stack_dependency_id = spacelift_stack_dependency.this[each.value.stack_id].id
   output_name         = each.value.output_name
   input_name          = each.value.input_name
 }
