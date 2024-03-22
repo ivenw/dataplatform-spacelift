@@ -32,7 +32,7 @@ variable "labels" {
 variable "dependencies" {
   description = "Other stacks this stack depends on"
   type = list(object({
-    id         = string
+    stack_id   = string
     references = map(string)
   }))
   default = []
@@ -67,7 +67,7 @@ resource "spacelift_stack_dependency" "this" {
 resource "spacelift_stack_dependency_reference" "this" {
   for_each = toset(flatten([
     for dependency in var.dependencies : [
-      for output_name, input_name in obj.references : {
+      for output_name, input_name in dependency.references : {
         stack_id    = dependency.id
         output_name = output_name
         input_name  = input_name
