@@ -31,11 +31,8 @@ variable "labels" {
 }
 variable "dependencies" {
   description = "Other stacks this stack depends on"
-  type = list(object({
-    stack_id   = string
-    references = map(string)
-  }))
-  default = []
+  type        = map(map(string))
+  default     = {}
 }
 
 locals {
@@ -58,24 +55,28 @@ resource "spacelift_stack" "this" {
 }
 
 resource "spacelift_stack_dependency" "this" {
-  for_each = toset(var.dependencies)
+  for_each = var.dependencies
 
   stack_id            = spacelift_stack.this.id
-  depends_on_stack_id = each.value.stack_id
+  depends_on_stack_id = each.key
 }
 
-resource "spacelift_stack_dependency_reference" "this" {
-  for_each = toset(flatten([
-    for dependency in var.dependencies : [
-      for output_name, input_name in dependency.references : {
-        stack_id    = dependency
+locals {
+  stack_dependencies = flatten([
+    for stack_id, references in var.dependencies : [
+      for output_name, input_name in references : {
+        stack_id    = stack_id
         output_name = output_name
         input_name  = input_name
       }
     ]
-  ]))
+  ])
+}
 
-  stack_dependency_id = spacelift_stack_dependency.this[each.value.stack_id].id
+resource "spacelift_stack_dependency_reference" "this" {
+  count = length(local.stack_dependencies)
+
+  stack_dependency_id = spacelift_stack_dependency.this[local.stack_dependencies[count.index].stack_id].id
   output_name         = each.value.output_name
   input_name          = each.value.input_name
 }

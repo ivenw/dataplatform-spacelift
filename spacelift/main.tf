@@ -72,13 +72,10 @@ module "test" {
   project_root = "stacks/integration"
   labels       = ["global", "dev"]
 
-  dependencies = [
-    {
-      stack_id = module.databricks_workspace_dev.stack_id
-      references = {
-        env = "TF_VAR_test"
-      }
+  dependencies = {
+    module.databricks_workspace_dev.stack_id = {
+      env = "TF_VAR_test"
     }
-  ]
+  }
 }
 
