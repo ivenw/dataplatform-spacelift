@@ -74,7 +74,7 @@ module "test" {
 
   dependencies = [
     {
-      stack_id = module.databricks_workspace_dev.id
+      stack_id = module.databricks_workspace_dev.stack_id
       references = {
         env = "TF_VAR_test"
       }
