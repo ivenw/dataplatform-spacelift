@@ -25,33 +25,31 @@ resource "spacelift_space" "dataplatform" {
   description     = "All stacks for the data platform"
 }
 
-resource "spacelift_context" "global" {
+module "context_global" {
+  source = "../modules/spacelift-context"
+
   name        = "global"
   space_id    = spacelift_space.dataplatform.id
   description = "Global context"
   labels      = ["autoattach:global"]
-}
-resource "spacelift_environment_variable" "location" {
-  context_id = spacelift_context.global.id
-  name       = "TF_VAR_location"
-  value      = "westeurope"
-  write_only = false
+  environment_variables = {
+    TF_VAR_location = "westeurope"
+  }
 }
 
-resource "spacelift_context" "environment_dev" {
+module "context_environment_dev" {
+  source = "../modules/spacelift-context"
+
   name        = "environment-dev"
   space_id    = spacelift_space.dataplatform.id
   description = "Development environment context"
   labels      = ["autoattach:dev"]
-}
-resource "spacelift_environment_variable" "environment_dev" {
-  context_id = spacelift_context.environment_dev.id
-  name       = "TF_VAR_environment_slug"
-  value      = "dev"
-  write_only = false
+  environment_variables = {
+    TF_VAR_environment_slug = "dev"
+  }
 }
 
-module "databricks_workspace_dev" {
+module "stack_databricks_workspace_dev" {
   source = "../modules/spacelift-stack"
 
   name     = "databricks-dev"
@@ -74,7 +72,7 @@ module "test" {
 
   dependencies = [
     {
-      stack_id = module.databricks_workspace_dev.stack_id
+      stack_id = module.stack_databricks_workspace_dev.stack_id
       references = {
         env = "TF_VAR_test"
       }
