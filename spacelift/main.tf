@@ -47,7 +47,7 @@ module "context_environment_resources" {
   name        = "environment-${each.key}"
   space_id    = spacelift_space.dataplatform.id
   description = "Development environment context"
-  labels      = ["autoattach:dev"]
+  labels      = ["autoattach:${each.key}"]
   environment_variables = {
     TF_VAR_environment_slug = each.key
   }
