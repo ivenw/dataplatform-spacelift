@@ -57,7 +57,10 @@ module "stack_databricks_workspace_dev" {
 
   repository   = "dataplatform-spacelift"
   project_root = "stacks/databricks-workspace"
-  labels       = ["global", "dev"]
+  labels = concat(
+    module.context_global.autoattach_labels,
+    module.context_environment_dev.autoattach_labels
+  )
 }
 
 module "test" {
