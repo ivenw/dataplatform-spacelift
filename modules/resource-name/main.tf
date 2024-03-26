@@ -54,9 +54,9 @@ locals {
     var.naming_data.slug,
     var.application_slug,
     var.workload,
-    local.scope_requires_guid ? local.guid_short : "",
+    var.environment,
     var.location_data.short_name,
-    var.environment
+    local.scope_requires_guid ? local.guid_short : "",
   ]))
   name_w_dashes  = join("-", local.name_list)
   name_wo_dashes = join("", local.name_list)
